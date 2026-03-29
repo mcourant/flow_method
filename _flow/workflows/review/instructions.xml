@@ -1,0 +1,134 @@
+<workflow id="flow-review" name="Adversarial Code Review">
+
+  <critical>YOU ARE AN ADVERSARIAL REVIEWER — find what's wrong or missing!</critical>
+  <critical>Find 3-10 specific issues minimum — no lazy "looks good" reviews</critical>
+  <critical>Read EVERY file in the File List — verify claims against actual code</critical>
+  <critical>Tasks marked [x] but not done = CRITICAL. ACs not implemented = HIGH.</critical>
+  <critical>Exclude _flow/, _flow_output/, .claude/, .cursor/ from review scope</critical>
+  <critical>Runtime validation is INDEPENDENT — do NOT trust dev agent claims</critical>
+
+  <step n="1" goal="Load story and discover changes">
+    <check if="story_path provided">
+      <action>Use story_path</action>
+    </check>
+    <check if="no story_path">
+      <action>Read sprint-status.yaml, find first story with status "review"</action>
+      <check if="no review story found">
+        <output>Aucune story en review. Lance /pm pour voir le dashboard.</output>
+        <action>HALT</action>
+      </check>
+    </check>
+
+    <action>Read COMPLETE story file</action>
+    <action>Parse: ACs, Tasks/Subtasks, File List, Change Log</action>
+    <action>Load learnings.xml — check known antipatterns are not reproduced</action>
+
+    <!-- Git reality check -->
+    <action>Run git status --porcelain + git diff --name-only + git diff --cached --name-only</action>
+    <action>Compare story File List vs git changes — note discrepancies:
+      - Files in git but not in story = MEDIUM (incomplete docs)
+      - Files in story but no git changes = HIGH (false claims)
+    </action>
+    <action>Create comprehensive review file list (union of story + git)</action>
+  </step>
+
+  <step n="2" goal="Build review plan">
+    <action>Extract ALL ACs and Tasks with completion status</action>
+    <action>Plan: AC Validation → Task Audit → Test Impact → Code Quality → Runtime Validation</action>
+  </step>
+
+  <step n="3" goal="Execute adversarial review">
+
+    <!-- AC Validation -->
+    <action>For EACH AC: search implementation for evidence → IMPLEMENTED / PARTIAL / MISSING.
+      MISSING or PARTIAL = HIGH finding.</action>
+
+    <!-- Task Completion Audit -->
+    <action>For EACH [x] task: search files for evidence it was done.
+      Marked [x] but NOT done = CRITICAL finding with file:line proof.</action>
+
+    <!-- Existing Test Impact -->
+    <action>For EACH modified *.ts/*.tsx: check if *.test.* exists.
+      If new hook/dependency added without mock in existing tests = HIGH finding.</action>
+
+    <!-- Code Quality -->
+    <action>For EACH file in review list:
+      - Security: injection, missing validation, auth
+      - Performance: N+1, inefficient loops
+      - Error handling: missing try/catch, poor messages
+      - Test quality: real assertions or tautological mocks?
+      - Code quality: complexity, magic numbers, naming
+    </action>
+
+    <!-- Learnings check -->
+    <action>Verify known antipatterns from learnings.xml are not reproduced:
+      - Tautological tests (mocks pass anything)
+      - God services (300+ lines, 8+ functions)
+      - Missing File List entries (test files, barrel exports)
+      - Components built but not wired into UI
+    </action>
+
+    <!-- Runtime Validation (MANDATORY for .tsx changes) -->
+    <check if="any modified file is .tsx in apps/web/src">
+      <critical>Code reading alone CANNOT catch rendering bugs. Take your OWN screenshots.</critical>
+
+      <action if=".pen Design Reference exists">Pencil MCP: batch_get + get_screenshot + snapshot_layout</action>
+      <action>Playwright MCP: browser_navigate + browser_take_screenshot for EVERY affected page</action>
+      <action if="Playwright fails">CRITICAL gap — report failure, do NOT proceed code-only</action>
+
+      <action if=".pen exists">Compare screenshot vs .pen — 5+ specific measurement comparisons</action>
+      <action>Verify REAL DATA renders — no empty states, broken images, stuck loaders</action>
+      <action>Search ALL modified .tsx for hardcoded Tailwind colors (text-{color}-{shade}, bg-{color}-{shade}).
+        Each should be semantic token = HIGH finding. Exception: white, black, transparent, current.</action>
+      <action>Verify all UI text in French — mixed languages = MEDIUM finding</action>
+    </check>
+
+    <!-- Minimum issue gate -->
+    <check if="less than 3 issues found">
+      <critical>NOT LOOKING HARD ENOUGH — re-examine for edge cases, arch violations, integration issues</critical>
+    </check>
+  </step>
+
+  <step n="4" goal="Present findings and fix">
+    <action>Categorize: CRITICAL / HIGH / MEDIUM / LOW</action>
+
+    <output>**CODE REVIEW — {{story_key}}**
+      Git vs Story: {{discrepancy_count}} discrepancies
+      Issues: {{critical_count}} Critical, {{high_count}} High, {{medium_count}} Medium, {{low_count}} Low
+
+      [Detailed findings by severity]
+    </output>
+
+    <ask>Action? [1] Fix automatiquement (HIGH+MEDIUM) [2] Creer action items [3] Details</ask>
+
+    <check if="fix">
+      <action>Fix all HIGH + MEDIUM issues in code</action>
+      <action>Add/update tests as needed</action>
+      <action>Update File List if files changed</action>
+      <action>Update Dev Agent Record with fixes</action>
+    </check>
+    <check if="action items">
+      <action>Add "Review Follow-ups (AI)" subsection to Tasks/Subtasks</action>
+      <action>Format: - [ ] [AI-Review][Severity] Description [file:line]</action>
+    </check>
+  </step>
+
+  <step n="5" goal="Update status">
+    <check if="all HIGH+MEDIUM fixed AND all ACs implemented">
+      <action>Update story Status → "done"</action>
+      <action>Re-read sprint-status.yaml, update → "done"</action>
+    </check>
+    <check if="issues remain">
+      <action>Update story Status → "in-progress"</action>
+      <action>Re-read sprint-status.yaml, update → "in-progress"</action>
+    </check>
+
+    <!-- Add review section to story -->
+    <action>Write "Senior Developer Review (AI)" section with: verdict, AC validation table, findings, test quality assessment</action>
+
+    <output>**Review complete — {{story_key}} → {{new_status}}**
+      Fixed: {{fixed_count}} | Action items: {{action_count}}
+      {{if done}}Pret pour le prochain dev!{{else}}Relance /dev pour corriger les items.{{/if}}</output>
+  </step>
+
+</workflow>

@@ -1,0 +1,171 @@
+<workflow id="flow-dev" name="Implement Story">
+
+  <critical>Execute ALL steps in exact order — do NOT skip steps</critical>
+  <critical>Do NOT stop for "milestones" or "session boundaries" — continue until story COMPLETE or HALT condition</critical>
+  <critical>Only modify story file in: Tasks/Subtasks checkboxes, Dev Agent Record, File List, Change Log, Status</critical>
+  <critical>NEVER implement anything not mapped to a specific task/subtask in the story file</critical>
+  <critical>NEVER mark a task [x] unless ALL validation gates pass — no lying</critical>
+
+  <!-- Config rules (from config.xml) are already loaded — they apply throughout -->
+
+  <step n="1" goal="Find next story and load context">
+    <check if="story_path is provided">
+      <action>Use story_path directly</action>
+    </check>
+
+    <check if="no story_path provided">
+      <action>Read FULL sprint-status.yaml</action>
+      <action>Find FIRST story with status "ready-for-dev" (pattern: N-N-name, NOT epic-X)</action>
+      <check if="no ready-for-dev story found">
+        <output>Aucune story ready-for-dev. Lance /story pour en creer une ou /pm pour voir le dashboard.</output>
+        <action>HALT</action>
+      </check>
+    </check>
+
+    <action>Read COMPLETE story file</action>
+    <action>Parse: Story, ACs, Tasks/Subtasks, Dev Notes, Dev Agent Record, File List, Change Log, Status</action>
+    <action>Extract developer guidance from Dev Notes</action>
+    <action>Load project-context.md if exists</action>
+    <action>Load learnings.xml — apply antipatterns as constraints throughout implementation</action>
+
+    <!-- Detect review continuation -->
+    <check if="'Senior Developer Review (AI)' section exists in story">
+      <action>Count unchecked [AI-Review] tasks in Review Follow-ups section</action>
+      <output>Resume apres code review — {{unchecked_count}} items restants. Priorite aux review follow-ups.</output>
+    </check>
+
+    <action>Identify first incomplete task (unchecked [ ])</action>
+    <action if="no incomplete tasks">GOTO step 5 (completion)</action>
+    <action if="story file inaccessible">HALT: "Cannot develop without story file"</action>
+  </step>
+
+  <step n="2" goal="Mark in-progress">
+    <action>Re-read sprint-status.yaml (concurrent safety)</action>
+    <action>Update story status: ready-for-dev → in-progress (or keep in-progress if resuming)</action>
+  </step>
+
+  <step n="3" goal="Implement task — red-green-refactor cycle">
+    <critical>FOLLOW STORY TASKS/SUBTASKS SEQUENCE EXACTLY — NO DEVIATION</critical>
+
+    <action>Review current task/subtask from story file</action>
+
+    <!-- DESIGN REFERENCE (visual tasks) -->
+    <check if="task has .pen node references or visual ACs">
+      <action>Verify .pen file exists at referenced path — if not, search for *.pen files</action>
+      <action>Pencil MCP: batch_get to read .pen nodes</action>
+      <action>Pencil MCP: get_screenshot for design visual reference</action>
+      <action>Pencil MCP: snapshot_layout for exact measurements (spacing, sizes, colors)</action>
+      <action>Store extracted specs: colors (hex → semantic tokens), spacing (px), typography, border-radius, shadows</action>
+      <action if="Pencil MCP fails">HALT: "Cannot extract design specs — verify .pen node IDs"</action>
+    </check>
+
+    <!-- RED: Write failing tests first -->
+    <action>Write FAILING tests for task functionality</action>
+    <action>Confirm tests fail (validates test correctness)</action>
+
+    <!-- GREEN: Minimal implementation -->
+    <action>Implement MINIMAL code to make tests pass</action>
+    <action>Run tests — confirm green</action>
+
+    <!-- EXISTING TEST IMPACT CHECK -->
+    <action>For EVERY modified source file: check if *.test.* exists. If yes, run those tests NOW.
+      If broken (missing mocks, changed interfaces), fix IMMEDIATELY.
+      Common: adding hook to component → tests need vi.mock() for that hook.
+      Search ALL test files that import the modified component — not just the direct test file.</action>
+
+    <!-- RUNTIME VALIDATION (MANDATORY for .tsx changes) -->
+    <check if="any .tsx file modified in this task">
+      <critical>MANDATORY — code reading alone CANNOT catch runtime rendering issues</critical>
+      <action>Playwright MCP: browser_navigate to affected page(s)</action>
+      <action>Playwright MCP: browser_take_screenshot</action>
+
+      <check if="task has .pen design references">
+        <action>Compare screenshot vs .pen design — document 5+ specific comparisons in Dev Agent Record
+          (widths, font-sizes, gaps, colors, border-radius). No vague "match confirmed".</action>
+        <action>Verify: semantic tokens (no hardcoded text-{color}-{shade}), spacing, typography, layout</action>
+      </check>
+
+      <action>Verify REAL DATA renders — not empty states, broken images, stuck loaders, missing sections</action>
+      <action>Verify ALL UI text is in French</action>
+      <action if="discrepancies found">Fix code → new screenshot → repeat until match</action>
+      <action if="Playwright fails">HALT: "Cannot validate runtime — verify dev server is running"</action>
+    </check>
+
+    <!-- REFACTOR -->
+    <action>Improve code structure while keeping tests green</action>
+    <action>Document approach in Dev Agent Record → Implementation Plan</action>
+
+    <action if="new dependencies beyond story specs">HALT: "Additional dependencies need user approval"</action>
+    <action if="3 consecutive failures">HALT and request guidance</action>
+  </step>
+
+  <step n="4" goal="Validate and mark task complete">
+    <action>Verify ALL tests for this task EXIST and PASS 100%</action>
+    <action>Verify implementation matches EXACTLY what the task specifies</action>
+    <action>Run full test suite — no regressions</action>
+
+    <!-- Runtime validation gate (frontend) -->
+    <check if="any .tsx modified">
+      <action>Verify Playwright screenshot taken for every affected page</action>
+      <action>Verify 5+ measurement comparisons documented</action>
+      <action>Verify all colors use semantic tokens</action>
+      <action>Verify all UI text in French</action>
+      <action>Verify no broken images, missing sections, stuck loaders</action>
+      <action if="validation not performed">DO NOT mark complete — run step 3 runtime validation first</action>
+    </check>
+
+    <!-- Review follow-up handling -->
+    <check if="task has [AI-Review] prefix">
+      <action>Mark checkbox [x] in Review Follow-ups AND matching Action Item in review section</action>
+      <action>Log in Dev Agent Record: "Resolved review finding [severity]: description"</action>
+    </check>
+
+    <!-- Mark complete only if ALL gates pass -->
+    <check if="ALL validations pass">
+      <action>Mark task [x] in story</action>
+      <action>Update File List with ALL new/modified/deleted files (include .test.* and index.ts!)</action>
+      <action>Add completion notes to Dev Agent Record</action>
+    </check>
+    <check if="ANY validation fails">
+      <action>DO NOT mark complete — fix first or HALT</action>
+    </check>
+
+    <check if="more incomplete tasks remain">
+      <action>GOTO step 3 (next task)</action>
+    </check>
+    <check if="no tasks remain">
+      <action>GOTO step 5 (completion)</action>
+    </check>
+  </step>
+
+  <step n="5" goal="Story completion — mark for review">
+    <action>Verify ALL tasks/subtasks marked [x]</action>
+    <action>Run full regression suite</action>
+    <action>Verify File List includes every changed file</action>
+
+    <!-- Definition of Done -->
+    <action>Validate DoD:
+      - All tasks/subtasks [x]
+      - All ACs implemented
+      - Unit tests + integration tests added/updated
+      - All tests pass (0 regressions)
+      - Visual validation completed (Playwright screenshots, 5+ comparisons documented) — if frontend
+      - No hardcoded colors where semantic tokens should be used — if frontend
+      - All UI text in French — if frontend
+      - File List complete (paths relative to repo root)
+      - Dev Agent Record has implementation notes
+      - Change Log has summary
+    </action>
+
+    <action if="DoD fails">HALT — address failures before completing</action>
+
+    <action>Update story Status → "review"</action>
+    <action>Re-read sprint-status.yaml (concurrent safety)</action>
+    <action>Update sprint-status: in-progress → review</action>
+
+    <output>Story {{story_key}} complete — status: review.
+      Fichier: {{story_path}}
+      Prochaine etape: lance /review pour la code review.</output>
+  </step>
+
+</workflow>

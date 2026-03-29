@@ -1,0 +1,113 @@
+<workflow id="flow-retro" name="Epic Retrospective">
+
+  <critical>Data-driven retrospective — extract metrics and patterns from actual story files</critical>
+  <critical>Generate actionable learnings that enrich learnings.xml for future stories</critical>
+
+  <step n="1" goal="Identify epic to retrospect">
+    <check if="epic number provided by user">
+      <action>Use provided epic_num</action>
+    </check>
+    <check if="no epic specified">
+      <action>Read sprint-status.yaml</action>
+      <action>Find epic where ALL stories are "done" but epic not yet "done" (retro pending)</action>
+      <check if="no epic ready for retro">
+        <output>Aucun epic pret pour une retro. Toutes les stories doivent etre done.</output>
+        <action>HALT</action>
+      </check>
+    </check>
+  </step>
+
+  <step n="2" goal="Load all story files for this epic">
+    <action>Find all story files matching epic-{{epic_num}} pattern in implementation artifacts</action>
+    <action>Read COMPLETE each story file</action>
+    <action>Extract per story:
+      - Status, number of tasks, task completion
+      - ACs count + implementation status
+      - Test counts (from Completion Notes)
+      - Files modified (from File List)
+      - Problems (from Debug Log)
+      - Review findings (from Senior Developer Review section)
+      - Time indicators (from Change Log dates)
+    </action>
+  </step>
+
+  <step n="3" goal="Analyze and extract metrics">
+    <action>Compile metrics:
+      - Stories delivered (count)
+      - Total tests (web + API + shared breakdown)
+      - Total files modified
+      - Review findings by severity (CRITICAL/HIGH/MEDIUM/LOW totals)
+      - Pre-existing test failures (if any)
+    </action>
+
+    <action>Analyze patterns:
+      - What went well: successful patterns, good decisions, smooth executions
+      - Problems encountered: each with root cause, impact, detection, fix, lesson
+      - Recurring issues: patterns that appeared in multiple stories
+    </action>
+
+    <action>Generate action items:
+      - Specific, actionable, with owner (team/agent/user)
+      - Distinguish: carry-forward (tech debt) vs process improvement vs convention change
+    </action>
+  </step>
+
+  <step n="4" goal="Generate retro file">
+    <action>Write retro file: _flow_output/implementation-artifacts/epic-{{epic_num}}-retro.md</action>
+    <action>Format:
+      # Epic {{epic_num}} Retrospective — {{epic_title}}
+      Date, stories delivered, test counts, commit counts
+
+      ## What went well
+      ## Problems encountered (P1, P2... with root cause + fix + lesson)
+      ## Pre-existing test failures
+      ## Metrics (table)
+      ## Action items (numbered)
+    </action>
+  </step>
+
+  <step n="5" goal="Enrich learnings.xml">
+    <action>Read current learnings.xml</action>
+    <action>For each Problem encountered and Action item:
+      - If it reveals a NEW pattern/antipattern not already in learnings.xml → add it
+      - If it reinforces an existing learning → update the epic list (add this epic number)
+      - If it contradicts an existing learning → update or remove the old one
+    </action>
+    <action>Update last-updated attribute on flow-learnings root</action>
+    <action>Save learnings.xml</action>
+  </step>
+
+  <step n="6" goal="Update sprint status">
+    <action>Re-read sprint-status.yaml (concurrent safety)</action>
+    <action>Update epic-{{epic_num}} status → "done"</action>
+  </step>
+
+  <step n="7" goal="Cleanup completed epic artifacts">
+    <critical>Keep the retro file — delete story files and epic planning file to reduce noise</critical>
+
+    <!-- Delete story files for this epic -->
+    <action>Find all story files matching pattern {{epic_num}}-*-*.md in _flow_output/implementation-artifacts/</action>
+    <action>Delete each story file (e.g., 13-1-client-sidebar.md, 13-2-dashboard.md, etc.)</action>
+    <action>Do NOT delete the retro file (epic-{{epic_num}}-retro.md) — it stays</action>
+
+    <!-- Delete fix files associated with this epic (if any) -->
+    <action>Find fix files referencing this epic in _flow_output/implementation-artifacts/ (pattern: fix-*)</action>
+    <action>Delete fix files that belong to this epic (check content for epic reference)</action>
+
+    <!-- Delete epic planning file -->
+    <action>Find epic planning file matching epic-{{epic_num}}*.md in _flow_output/planning-artifacts/</action>
+    <action>Delete the epic planning file</action>
+
+    <!-- Remove completed stories from sprint-status.yaml -->
+    <action>Re-read sprint-status.yaml</action>
+    <action>Remove all story entries for epic-{{epic_num}} (they are done and archived in retro)</action>
+    <action>Keep the epic-{{epic_num}} entry with status "done"</action>
+
+    <output>**Retro Epic {{epic_num}} terminee!**
+      Fichier: _flow_output/implementation-artifacts/epic-{{epic_num}}-retro.md
+      Learnings: {{new_learnings_count}} nouveaux, {{updated_learnings_count}} mis a jour
+      Cleanup: {{deleted_stories}} story files supprimes, epic planning supprime
+      Lance /pm pour voir le prochain epic.</output>
+  </step>
+
+</workflow>

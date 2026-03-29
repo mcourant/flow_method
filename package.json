@@ -1,0 +1,23 @@
+{
+  "name": "flow-method",
+  "version": "1.0.0",
+  "description": "AI-driven development workflow for Claude Code — story creation, dev, review, retro, and more",
+  "bin": {
+    "flow-method": "./bin/init.js"
+  },
+  "keywords": [
+    "claude-code",
+    "workflow",
+    "ai-development",
+    "code-review",
+    "retrospective"
+  ],
+  "author": "Max",
+  "license": "MIT",
+  "files": [
+    "bin/",
+    "_flow/",
+    ".claude/",
+    "_flow_output/"
+  ]
+}

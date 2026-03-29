@@ -1,0 +1,7 @@
+<flow-learnings last-updated="{{DATE}}">
+
+  <!-- Learnings are auto-populated by the /retro workflow -->
+  <!-- Severity: high, medium, low -->
+  <!-- Types: antipattern, convention -->
+
+</flow-learnings>

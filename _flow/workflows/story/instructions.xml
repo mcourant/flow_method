@@ -1,0 +1,96 @@
+<workflow id="flow-story" name="Create Next Story">
+
+  <critical>Create a comprehensive story file that gives the dev agent EVERYTHING needed for flawless implementation</critical>
+  <critical>EXHAUSTIVE ANALYSIS — thoroughly analyze artifacts, do NOT skim</critical>
+  <critical>Prevent common LLM mistakes: reinventing wheels, wrong libraries, wrong file locations, vague implementations</critical>
+  <critical>ZERO USER INTERVENTION except for initial epic/story selection</critical>
+
+  <step n="1" goal="Determine target story">
+    <check if="story_path or epic-story number provided by user">
+      <action>Parse: extract epic_num, story_num, story_key</action>
+      <action>GOTO step 2</action>
+    </check>
+
+    <action>Read FULL sprint-status.yaml</action>
+    <action>Find FIRST story with status "backlog" (pattern: N-N-name, NOT epic-X)</action>
+
+    <check if="no backlog story found">
+      <output>Toutes les stories sont deja creees ou en cours. Lance /pm pour voir le dashboard.</output>
+      <action>HALT</action>
+    </check>
+
+    <action>Extract epic_num, story_num, story_key from found entry</action>
+
+    <!-- Check if file already exists -->
+    <action>Search implementation artifacts for existing {{story_key}}*.md</action>
+    <check if="file exists">
+      <ask>Story file existe deja. [skip] passer a la suivante ou [overwrite] ecraser?</ask>
+    </check>
+
+    <!-- Mark epic in-progress if first story -->
+    <check if="first story in epic (N-1-*)">
+      <action>Update epic-N status: backlog → in-progress in sprint-status.yaml</action>
+    </check>
+  </step>
+
+  <step n="2" goal="Load and analyze artifacts">
+    <critical>This is where you prevent future developer mistakes — be thorough!</critical>
+
+    <!-- Epic context -->
+    <action>Load epic file from planning artifacts (epic-{{epic_num}}*.md)</action>
+    <action>Extract: epic objectives, ALL stories for cross-story context, our story's requirements, ACs, dependencies</action>
+
+    <!-- Design extraction (when .pen references exist) -->
+    <check if="story has .pen Design Reference in epic">
+      <action>Pencil MCP: batch_get to read .pen nodes</action>
+      <action>Pencil MCP: get_screenshot for visual reference</action>
+      <action>Pencil MCP: snapshot_layout for exact measurements</action>
+      <action>Extract into Dev Notes: colors (hex → semantic tokens), typography (px), spacing (px), layout specs</action>
+      <action>Add "Design Tokens Reference" subsection mapping .pen values → Tailwind classes</action>
+      <action>Add: "VISUAL VALIDATION REQUIRED: Playwright MCP screenshot after implementation"</action>
+    </check>
+
+    <!-- Previous story analysis -->
+    <check if="story_num > 1">
+      <action>Find and load previous story file in same epic</action>
+      <action>Extract: learnings, review feedback, code patterns established, problems encountered</action>
+    </check>
+
+    <!-- Architecture analysis -->
+    <action>Load architecture doc (if exists) — extract story-relevant patterns:
+      tech stack, code structure, API patterns, DB schemas, security, testing standards</action>
+
+    <!-- Git intelligence -->
+    <action>Get last 5 commit titles for recent work patterns</action>
+    <action>Analyze: files modified, conventions used, dependencies added</action>
+
+    <!-- Learnings check -->
+    <action>Load learnings.xml — integrate relevant antipatterns into story Dev Notes as warnings</action>
+  </step>
+
+  <step n="3" goal="Create story file">
+    <action>Generate story file at: _flow_output/implementation-artifacts/{{story_key}}.md</action>
+    <action>Use template from _flow/templates/story.md</action>
+
+    <action>Populate sections:
+      - Story: user story from epic
+      - Context & Motivation: business value + technical context
+      - ACs: BDD format from epic (Given/When/Then)
+      - Tasks/Subtasks: detailed implementation steps with AC references
+      - Dev Notes: architecture requirements, key files, constraints, design tokens, previous story learnings, relevant antipatterns from learnings.xml
+    </action>
+
+    <action>Set Status: ready-for-dev</action>
+  </step>
+
+  <step n="4" goal="Update sprint status and finalize">
+    <action>Re-read sprint-status.yaml (concurrent safety)</action>
+    <action>Update story status: backlog → ready-for-dev</action>
+
+    <output>**Story {{story_key}} creee!**
+      Fichier: {{story_path}}
+      Status: ready-for-dev
+      Prochaine etape: lance /dev pour implementer.</output>
+  </step>
+
+</workflow>

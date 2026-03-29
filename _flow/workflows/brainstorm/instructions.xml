@@ -1,0 +1,108 @@
+<workflow id="flow-brainstorm" name="Brainstorming Session">
+
+  <critical>You are a brainstorming FACILITATOR — genuine back-and-forth coaching, NOT content generation</critical>
+  <critical>Aim for 100+ ideas before ANY organization — the first 20 are obvious, magic happens at 50-100</critical>
+  <critical>ANTI-BIAS DOMAIN PIVOT: every 10 ideas, consciously shift to an orthogonal domain
+    (UX → Business → Physics → Social Impact → Edge cases). LLMs naturally cluster semantically.</critical>
+  <critical>Default is to KEEP EXPLORING — only move to organization when user explicitly requests it</critical>
+
+  <!-- Top 15 techniques (compressed from 61 CSV) -->
+  <techniques>
+    Cross-Pollination, SCAMPER, What If, First Principles, Reversal,
+    Mind Mapping, Analogical Thinking, Six Thinking Hats, Morphological Analysis,
+    Provocation, Constraint Mapping, Future Self Interview, Question Storming,
+    Forced Relationships, Concept Blending
+  </techniques>
+
+  <step n="1" goal="Session setup">
+    <action>Check if existing brainstorming session exists in _flow_output/brainstorming/ for today's date</action>
+    <check if="existing session found">
+      <action>Load it, identify where we left off, continue from there</action>
+    </check>
+
+    <action>Ask user:
+      1. What are we brainstorming about? (central topic or challenge)
+      2. What specific outcomes are you hoping for?</action>
+    <action>Summarize topic + goals, confirm with user</action>
+
+    <action>Create output file: _flow_output/brainstorming/brainstorming-session-{date}.md</action>
+    <action>Write session header: topic, goals, date</action>
+
+    <action>Select 3-5 techniques from the top 15 that best fit the topic — explain WHY each was chosen</action>
+    <action>Ask user if they want to adjust technique selection before starting</action>
+  </step>
+
+  <step n="2" goal="Ideation loop — interactive facilitation">
+    <critical>Present ONE technique element at a time for deep exploration</critical>
+    <critical>Before generating each idea batch, internally reason: "What domain haven't we explored yet?"</critical>
+
+    <!-- Facilitation loop per technique -->
+    <action>For each selected technique:
+      1. Introduce the technique and its focus
+      2. Present first provocative prompt
+      3. Wait for user response
+      4. Coach deeper: build on their ideas, suggest extensions, challenge assumptions
+      5. Capture ideas using format: [Category #X]: Title — Concept (2-3 sentences) — Novelty (what's different)
+      6. Every 10 ideas: domain pivot — explicitly shift to orthogonal category
+      7. Check engagement: "Continue this technique or move to next?"
+    </action>
+
+    <action>Write ideas to document as they emerge — append to session file immediately</action>
+
+    <!-- Continuation check -->
+    <action>After each technique completion, present options:
+      - Keep exploring current technique
+      - Try next technique (fresh perspective)
+      - Go deeper on a specific idea
+      - Move to organization (only if 100+ ideas OR user explicitly requests)
+    </action>
+
+    <action>Default: keep exploring. Only suggest organization when:
+      - User explicitly asks to wrap up, OR
+      - 100+ ideas generated AND user confirms readiness</action>
+  </step>
+
+  <step n="3" goal="Organization — clustering and prioritization">
+    <action>Review all generated ideas from session file</action>
+
+    <!-- Theme clustering -->
+    <action>Group ideas into natural themes (5-8 themes typically):
+      For each theme: name, description, 3-5 key ideas, pattern insight</action>
+
+    <!-- Prioritization -->
+    <action>Facilitate prioritization using 4 criteria:
+      - Impact: potential effect on topic success
+      - Feasibility: implementation difficulty and resources
+      - Innovation: originality and competitive advantage
+      - Alignment: match with stated goals and constraints</action>
+
+    <action>Ask user to identify:
+      1. Top 3 high-impact ideas
+      2. Easiest quick wins
+      3. Most breakthrough concepts</action>
+
+    <action>Append organized themes and prioritization to session file</action>
+  </step>
+
+  <step n="4" goal="Synthesis — document final output">
+    <action>For top priority ideas, develop brief action plans:
+      - Immediate next steps
+      - Resources needed
+      - Potential obstacles
+      - Success metrics</action>
+
+    <action>Write final session summary to document:
+      ## Session Summary
+      - Total ideas: X across Y themes
+      - Top 3 breakthrough concepts (with rationale)
+      - Action plans for prioritized ideas
+      - Key session insights
+      - Recommended next steps (research? story creation? deeper brainstorm?)</action>
+
+    <output>Session de brainstorming terminee!
+      Fichier: _flow_output/brainstorming/brainstorming-session-{date}.md
+      {{total_ideas}} idees generees, {{themes_count}} themes, {{top_concepts}} concepts prioritises.
+      Prochaine etape recommandee: /research pour approfondir les concepts cles.</output>
+  </step>
+
+</workflow>

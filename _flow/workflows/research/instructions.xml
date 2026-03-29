@@ -1,0 +1,137 @@
+<workflow id="flow-research" name="Research — Market / Domain / Technical">
+
+  <critical>Web search is REQUIRED — if unavailable, HALT immediately</critical>
+  <critical>Use parallel web searches for efficiency</critical>
+  <critical>ALL claims must have citations with URLs — no unsourced assertions</critical>
+  <critical>Multi-source validation for critical claims (market size, growth rates, competitive data)</critical>
+  <critical>Add confidence levels (High/Medium/Low) on uncertain data</critical>
+  <critical>Write findings to document IMMEDIATELY as discovered — do NOT batch at the end</critical>
+
+  <!-- Unified workflow: type (market/domain/technical) is a parameter, not a separate workflow -->
+
+  <step n="1" goal="Scope — topic, type, goals">
+    <action>Ask user:
+      1. What topic do you want to research?
+      2. What type? market (customer/competition) / domain (industry/regulatory) / technical (architecture/tools)
+      3. What specific goals or questions to answer?
+      4. Any geographic or segment constraints?</action>
+
+    <action>Check for existing research in _flow_output/planning-artifacts/research/ on this topic</action>
+    <check if="existing research found">
+      <action>Load it, summarize what's already covered, identify gaps to fill</action>
+      <ask>Continuer cette recherche existante ou en demarrer une nouvelle?</ask>
+    </check>
+
+    <action>Confirm scope with user: topic, type, goals, constraints</action>
+    <action>Create output file: _flow_output/planning-artifacts/research/{type}-{topic}-{date}.md</action>
+    <action>Write research header: topic, type, goals, methodology, date</action>
+  </step>
+
+  <step n="2" goal="Core research — parallel web searches by type">
+    <critical>Launch multiple web searches in parallel for efficiency</critical>
+
+    <!-- Market type -->
+    <check if="type == market">
+      <action>Research in parallel:
+        - Market size + growth projections (TAM/SAM/SOM if applicable)
+        - Customer segments + behavior patterns
+        - Key trends and market dynamics
+        - Pricing models and revenue patterns</action>
+      <action>For each data point: source URL, date, confidence level</action>
+      <action>Write "Market Overview" section to document immediately</action>
+    </check>
+
+    <!-- Domain type -->
+    <check if="type == domain">
+      <action>Research in parallel:
+        - Industry structure and key players
+        - Domain-specific terminology and concepts
+        - Current state and evolution trajectory
+        - Best practices and established patterns</action>
+      <action>Write "Domain Analysis" section to document immediately</action>
+    </check>
+
+    <!-- Technical type -->
+    <check if="type == technical">
+      <action>Research in parallel:
+        - Technology landscape and alternatives
+        - Performance benchmarks and comparisons
+        - Community size, maturity, maintenance status
+        - Integration patterns and compatibility</action>
+      <action>Write "Technical Evaluation" section to document immediately</action>
+    </check>
+  </step>
+
+  <step n="3" goal="Competitive / landscape analysis">
+    <check if="type == market">
+      <action>Identify top 5-10 competitors via web search</action>
+      <action>For each: positioning, pricing, strengths/weaknesses, market share (if available)</action>
+      <action>Competitive matrix: feature comparison table</action>
+      <action>Identify market gaps and differentiation opportunities</action>
+    </check>
+
+    <check if="type == domain">
+      <action>Map industry ecosystem: suppliers, buyers, substitutes, new entrants</action>
+      <action>Identify leading organizations and their approaches</action>
+      <action>Map domain-specific tools, platforms, standards</action>
+    </check>
+
+    <check if="type == technical">
+      <action>Compare top 3-5 technology options side-by-side</action>
+      <action>Decision matrix: performance, DX, community, cost, scalability</action>
+      <action>Document migration paths and lock-in risks</action>
+    </check>
+
+    <action>Write competitive/landscape section to document immediately</action>
+  </step>
+
+  <step n="4" goal="Deep dive — specific to research type">
+    <check if="type == market">
+      <action>Customer pain points: top 5 problems with evidence</action>
+      <action>Purchase decision factors: what drives buying decisions</action>
+      <action>Customer journey mapping: awareness → consideration → decision</action>
+    </check>
+
+    <check if="type == domain">
+      <action>Regulatory landscape: current and upcoming regulations</action>
+      <action>Compliance requirements specific to the domain</action>
+      <action>Industry standards and certifications</action>
+    </check>
+
+    <check if="type == technical">
+      <action>Architecture patterns: recommended approaches with trade-offs</action>
+      <action>Implementation considerations: common pitfalls, gotchas, versioning</action>
+      <action>Security and performance implications</action>
+    </check>
+
+    <action>Write deep dive section to document</action>
+  </step>
+
+  <step n="5" goal="Synthesis — conclusions and recommendations">
+    <action>Compile key findings across all sections</action>
+    <action>Write synthesis:
+      ## Key Findings
+      - Top 5 critical insights (with source references)
+
+      ## Strategic Recommendations
+      - 3-5 actionable recommendations ranked by impact
+      - For each: rationale, evidence, implementation hint
+
+      ## Risks and Uncertainties
+      - Data gaps identified (what we couldn't find)
+      - Low-confidence claims that need validation
+      - Market/domain risks to monitor
+
+      ## Next Steps
+      - Recommended follow-up research
+      - Decisions this research enables
+      - Connection to project planning (/brainstorm or /story)
+    </action>
+
+    <output>Recherche terminee!
+      Fichier: _flow_output/planning-artifacts/research/{type}-{topic}-{date}.md
+      {{findings_count}} insights cles, {{recommendations_count}} recommandations.
+      Prochaine etape: /story pour creer des stories basees sur ces insights, ou /brainstorm pour explorer les opportunites.</output>
+  </step>
+
+</workflow>

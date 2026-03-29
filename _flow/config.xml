@@ -1,0 +1,21 @@
+<flow-config>
+  <project name="{{PROJECT_NAME}}" />
+  <user name="{{USER_NAME}}" />
+  <language communication="{{COMM_LANG}}" documents="{{DOC_LANG}}" />
+  <paths>
+    <planning>_flow_output/planning-artifacts</planning>
+    <implementation>_flow_output/implementation-artifacts</implementation>
+    <sprint-status>_flow_output/implementation-artifacts/sprint-status.yaml</sprint-status>
+    <project-context>**/project-context.md</project-context>
+    <learnings>_flow/learnings.xml</learnings>
+  </paths>
+  <rules>
+    <rule>Read files COMPLETELY — never use offset/limit on workflow files</rule>
+    <rule>Before modifying ANY source file, read its current content first</rule>
+    <rule>Before editing shared files (sprint-status.yaml, config), re-read immediately before writing</rule>
+    <rule>EXISTING TEST IMPACT: when modifying *.ts/*.tsx, check corresponding *.test.* — fix broken tests immediately</rule>
+    <rule>VISUAL VALIDATION: Pencil MCP (design) + Playwright MCP (runtime) for ALL .tsx changes — MANDATORY</rule>
+    <rule>Verify .pen file exists at referenced path before using node IDs</rule>
+    <rule>Execute continuously — do NOT pause for milestones or session boundaries unless HALT condition</rule>
+  </rules>
+</flow-config>

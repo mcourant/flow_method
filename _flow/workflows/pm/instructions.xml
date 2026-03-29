@@ -1,0 +1,56 @@
+<workflow id="flow-pm" name="PM Dashboard & Orchestrator">
+
+  <critical>Present clear status and recommend the SINGLE best next action</critical>
+
+  <step n="1" goal="Load project state">
+    <action>Read FULL sprint-status.yaml</action>
+    <action>Parse ALL entries: epics (epic-N) and stories (N-N-name) with their statuses</action>
+    <action>Load learnings.xml for recent context</action>
+  </step>
+
+  <step n="2" goal="Analyze and present dashboard">
+    <action>For each epic in-progress or backlog:
+      - Count stories by status: backlog, ready-for-dev, in-progress, review, done
+      - Calculate progression: X/Y stories done
+    </action>
+
+    <output>
+      **FLOW Dashboard — {{project_name}}**
+      Date: {{date}}
+
+      ## Epics
+      {{for each epic}}
+      **Epic {{N}}: {{title}}** — {{status}}
+        Progress: {{done_count}}/{{total_count}} stories
+        {{story_status_breakdown}}
+      {{/for}}
+
+      ## Stories en attente d'action
+      {{list stories needing action: review, ready-for-dev, in-progress}}
+
+      ## Derniers learnings
+      {{last 3 high-severity learnings from learnings.xml}}
+    </output>
+  </step>
+
+  <step n="3" goal="Recommend next action">
+    <action>Determine priority order:
+      1. Story in "review" → recommend /review (unblock the pipeline)
+      2. Story in "in-progress" → recommend /dev (continue work)
+      3. Story in "ready-for-dev" → recommend /dev (start next)
+      4. Epic with all stories "done" → recommend /retro
+      5. Story in "backlog" → recommend /story (create next)
+      6. No stories left → recommend creating new epic in planning
+    </action>
+
+    <output>
+      ## Recommandation
+      **{{recommended_action}}**
+      {{context_why}}
+      ```
+      /{{command}} {{args_if_any}}
+      ```
+    </output>
+  </step>
+
+</workflow>
