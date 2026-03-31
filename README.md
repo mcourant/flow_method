@@ -1,8 +1,6 @@
 <div align="center">
 
 <br>
-<img src="https://raw.githubusercontent.com/mcourant/flow_method/main/assets/flow-banner.jpg" alt="Flow Method" width="100%" />
-<br><br>
 
 **AI-driven development workflow for Claude Code**
 
