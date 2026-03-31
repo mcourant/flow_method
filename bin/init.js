@@ -5,29 +5,77 @@ const path = require('path');
 
 const targetDir = process.cwd();
 const packageDir = path.resolve(__dirname, '..');
+const args = process.argv.slice(2);
+const command = args[0];
 
 // Files/dirs to copy into the target project
 const entries = ['_flow', '.claude', '_flow_output'];
 
-function copyRecursive(src, dest) {
+function copyRecursive(src, dest, { forceUpdate = false } = {}) {
   const stat = fs.statSync(src);
   if (stat.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
     for (const child of fs.readdirSync(src)) {
-      copyRecursive(path.join(src, child), path.join(dest, child));
+      copyRecursive(path.join(src, child), path.join(dest, child), { forceUpdate });
     }
   } else {
-    // Don't overwrite existing files (preserve user customizations)
+    const rel = path.relative(targetDir, dest);
+
     if (fs.existsSync(dest)) {
-      console.log(`  SKIP (exists): ${path.relative(targetDir, dest)}`);
+      if (forceUpdate) {
+        // In update mode: overwrite workflows and commands, skip config/learnings/user data
+        const skipPatterns = ['config.xml', 'learnings.xml', 'sprint-status.yaml', '.gitkeep'];
+        if (skipPatterns.some(p => dest.endsWith(p))) {
+          console.log(`  SKIP (user data): ${rel}`);
+          return;
+        }
+
+        // Skip _flow_output files (user's work)
+        if (dest.includes('_flow_output') && !dest.endsWith('.gitkeep')) {
+          console.log(`  SKIP (user data): ${rel}`);
+          return;
+        }
+
+        // Check if file actually changed
+        const srcContent = fs.readFileSync(src);
+        const destContent = fs.readFileSync(dest);
+        if (srcContent.equals(destContent)) {
+          return; // Silent skip — no change
+        }
+
+        fs.copyFileSync(src, dest);
+        console.log(`  UPDATE: ${rel}`);
+      } else {
+        console.log(`  SKIP (exists): ${rel}`);
+      }
       return;
     }
+
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.copyFileSync(src, dest);
-    console.log(`  COPY: ${path.relative(targetDir, dest)}`);
+    console.log(`  ${forceUpdate ? 'ADD' : 'COPY'}: ${rel}`);
   }
 }
 
+// ─── UPDATE MODE ───
+if (command === 'update') {
+  console.log('\n  FLOW Method — Update\n');
+  console.log('  Updating workflows, commands, and templates...');
+  console.log('  (Your config.xml, learnings.xml, and output files are preserved)\n');
+
+  for (const entry of entries) {
+    const src = path.join(packageDir, entry);
+    const dest = path.join(targetDir, entry);
+    if (fs.existsSync(src)) {
+      copyRecursive(src, dest, { forceUpdate: true });
+    }
+  }
+
+  console.log('\n  Update complete! Your config and data are untouched.\n');
+  process.exit(0);
+}
+
+// ─── INIT MODE (default) ───
 console.log('\n  FLOW Method — Init\n');
 
 // Check if _flow already exists
@@ -81,6 +129,7 @@ if (configContent.includes('{{PROJECT_NAME}}')) {
     console.log('    /pm          — Dashboard & next action');
     console.log('    /story       — Create next story');
     console.log('    /dev         — Implement a story');
+    console.log('    /design      — UX/UI design');
     console.log('    /review      — Adversarial code review');
     console.log('    /retro       — Epic retrospective');
     console.log('    /brainstorm  — Brainstorming session');
