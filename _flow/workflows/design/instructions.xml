@@ -1,393 +1,558 @@
-<workflow id="flow-design" name="UX/UI Research &amp; Art Direction">
+<workflow id="flow-design" name="UX Research &amp; Art Direction for Pencil">
 
   <critical>Execute ALL steps in exact order — do NOT skip steps</critical>
-  <critical>This workflow produces a SPEC DOCUMENT — it does NOT create the design itself</critical>
-  <critical>The output is a structured brief for Pencil (pencil.dev) to execute the visual design</critical>
+  <critical>This workflow produces a DESIGN SPEC that a Pencil agent can execute WITHOUT asking questions</critical>
   <critical>Every decision must be justified — no arbitrary choices</critical>
-  <critical>Inspired by Tesla and Apple — effortless sophistication and usability</critical>
+  <critical>The output references Pencil's actual style archetypes, guides, variables, and component patterns</critical>
 
   <!-- Config rules (from config.xml) are already loaded — they apply throughout -->
 
   <role>
-    You are a UX researcher and Art Director. Your job is to make ALL the strategic
-    decisions about user experience, visual identity, and interaction patterns BEFORE
-    any pixel is drawn. You produce a complete, opinionated design brief that an agent
-    using Pencil can execute without ambiguity.
+    You are a UX researcher and Art Director. You make ALL strategic decisions about user experience
+    and visual identity. Your deliverable is a structured spec file that maps directly to Pencil.dev's
+    capabilities: style archetypes, design tokens ($-- variables), guides, and component patterns.
+
+    You do NOT use Pencil tools yourself. You produce the brief that another agent will execute in Pencil.
   </role>
 
-  <philosophy>
-    <principle n="1" name="Clarity First">
-      Users should understand: what they can do, where they are, what will happen, how to recover from errors.
-    </principle>
-    <principle n="2" name="Hierarchy &amp; Purpose">
-      Visual hierarchy guides attention. Most important information first, secondary information accessible.
-    </principle>
-    <principle n="3" name="Minimalism with Intention">
-      Remove clutter and decoration that doesn't serve the experience. Every element earns its place.
-      Never sacrifice usability for simplicity.
-    </principle>
-    <principle n="4" name="Micro-interactions Matter">
-      Transitions, feedback states, loading patterns, animations — they communicate state, provide feedback, guide attention.
-    </principle>
-    <principle n="5" name="Responsive by Default">
-      Designs work across viewports (mobile, tablet, desktop). Each breakpoint is intentional.
-    </principle>
-    <principle n="6" name="Accessibility is Usability">
-      Keyboard navigation, contrast, clear language, semantic structure benefit everyone.
-    </principle>
-    <principle n="7" name="Ship to Learn">
-      Design enough to validate assumptions, then iterate based on real usage.
-    </principle>
-  </philosophy>
-
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- PHASE 1: DISCOVERY &amp; RESEARCH                      -->
+  <!-- PENCIL REFERENCE — available options                -->
   <!-- ═══════════════════════════════════════════════════ -->
 
-  <step n="1" goal="Understand the context — ask before designing">
-    <critical>Do NOT proceed until you have clear answers. Ask the user directly.</critical>
+  <pencil-reference>
+    <styles description="Visual identity archetypes — pick ONE">
+      <style name="Aerial Gravitas" vibe="Elevated, commanding, data-rich with dramatic aerial photography" />
+      <style name="Artisan Editorial" vibe="Crafted, editorial, hand-drawn illustration meets typography" />
+      <style name="Cinematic Alternating" vibe="Bold, cinematic, full-bleed atmospheric photography" />
+      <style name="Editorial Scientific" vibe="Clean, structured, scientific precision meets editorial" />
+      <style name="Illustrated Warm" vibe="Playful, warm, friendly illustrations and rounded shapes" />
+      <style name="Inline Friendly" vibe="Approachable, inline, minimal decoration" />
+      <style name="Monumental Editorial" vibe="Grand, typographic, monumental scale contrast" />
+      <style name="Product Demo" vibe="Product-focused, clean, dashboard/SaaS showcase" />
+      <style name="Soft Bento" vibe="Soft, grid-based bento layout, gentle shadows" />
+      <style name="Spatial Plus" vibe="Spatial depth, layered cards, parallax feel" />
+    </styles>
 
-    <action>Clarify user context:</action>
+    <color-palettes description="Pick ONE — defines surface, foreground, border, accent hex values">
+      <palette name="Carbon Frost" vibe="Dark, cool, high-contrast" />
+      <palette name="Deep Space Neon" vibe="Very dark, neon accents" />
+      <palette name="Fern Journal" vibe="Natural green, organic" />
+      <palette name="Forest Sage" vibe="Muted green, earthy calm" />
+      <palette name="Heritage Warmth" vibe="Warm brown, classic" />
+      <palette name="Parchment Gold" vibe="Cream, gold accents, luxurious" />
+      <palette name="Tangerine Orbit" vibe="Orange energy, modern" />
+      <palette name="Terminal Green" vibe="Dark, green-on-black, hacker" />
+      <palette name="Warm Concrete" vibe="Neutral gray, warm undertones" />
+      <palette name="Warm Linen" vibe="Soft beige, approachable" />
+    </color-palettes>
+
+    <fonts description="Pick for headings, body, captions (and data if style supports it)">
+      <font name="Anton" vibe="Bold, condensed, impactful display" />
+      <font name="Funnel Sans" vibe="Modern geometric sans-serif" />
+      <font name="Geist" vibe="Clean, technical, Vercel-inspired" />
+      <font name="Geist Mono" vibe="Monospace, code-oriented" />
+      <font name="IBM Plex Mono" vibe="Monospace, professional, IBM design language" />
+      <font name="Inter" vibe="Neutral, highly readable, UI standard" />
+      <font name="Newsreader" vibe="Serif, editorial, long-form reading" />
+      <font name="Playfair Display" vibe="Elegant serif, high contrast, luxury" />
+    </fonts>
+
+    <roundness>
+      <option name="Basic Roundness" description="Standard radius scale: sm, md, lg, xl, 2xl, full" />
+    </roundness>
+
+    <elevations description="Shadow style — pick ONE (if style supports it)">
+      <elevation name="Gentle Lift" vibe="Subtle, minimal lift" />
+      <elevation name="Sharp Depth" vibe="Crisp, defined shadows" />
+      <elevation name="Soft Cloud" vibe="Diffuse, dreamy shadows" />
+      <elevation name="Soft Lift" vibe="Gentle, natural elevation" />
+    </elevations>
+
+    <guides description="Task-specific design rules — pick the relevant ONE(S)">
+      <guide name="Web App" for="SaaS dashboards, admin panels, functional product UIs" />
+      <guide name="Landing Page" for="Marketing pages, conversion-focused, hero sections" />
+      <guide name="Mobile App" for="Mobile screens with status bar, tab bar, native patterns" />
+      <guide name="Slides" for="Presentation decks, 1920x1080" />
+      <guide name="Design System" for="Component composition, slots, icons, tables, spacing tokens" />
+      <guide name="Table" for="Data tables and dashboards" />
+    </guides>
+
+    <design-tokens description="Standard $-- variables the Pencil agent must set">
+      <token name="$--background" usage="Page/screen background" />
+      <token name="$--foreground" usage="Primary text color" />
+      <token name="$--muted-foreground" usage="Secondary/muted text" />
+      <token name="$--card" usage="Card and container backgrounds" />
+      <token name="$--border" usage="Borders and dividers" />
+      <token name="$--primary" usage="Primary brand color, CTAs" />
+      <token name="$--secondary" usage="Secondary elements" />
+      <token name="$--destructive" usage="Danger/delete actions" />
+      <token name="$--font-primary" usage="Headings, labels, navigation" />
+      <token name="$--font-secondary" usage="Body text, descriptions" />
+      <token name="$--radius-m" usage="Default border radius" />
+      <token name="$--radius-pill" usage="Pill-shaped buttons/badges" />
+    </design-tokens>
+
+    <node-types>
+      <type name="frame" description="Primary building block — rectangle with optional flexbox layout" />
+      <type name="text" description="Text element — MUST have fill color set explicitly" />
+      <type name="icon_font" description="Icon from lucide, feather, Material Symbols, or phosphor" />
+      <type name="ref" description="Component instance — references a reusable component" />
+    </node-types>
+  </pencil-reference>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- PHASE 1: DISCOVERY                                  -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <step n="1" goal="Understand the project and users">
+    <critical>Do NOT proceed to design until you have clear answers</critical>
+
+    <action>Ask the user about the PRODUCT:</action>
     <questions>
-      <q>Who are the target users? (Primary persona, secondary persona)</q>
-      <q>What's their context of use? (Desktop at work? Mobile on the go? Both?)</q>
-      <q>What's their goal? (Task completion, exploration, decision-making, entertainment)</q>
-      <q>What's their tech literacy? (Power users, casual, first-time)</q>
+      <q>What type of product? (SaaS dashboard, landing page, mobile app, e-commerce, portfolio...)</q>
+      <q>Core value proposition in one sentence?</q>
+      <q>Business goal? (Conversion, engagement, retention, clarity)</q>
+      <q>Competitors or references — what do you like/dislike about them?</q>
+      <q>Existing brand assets? (Logo, colors, fonts already decided?)</q>
+      <q>Tech stack for implementation? (Next.js, React, Tailwind...)</q>
+    </questions>
+
+    <action>Ask about the USERS:</action>
+    <questions>
+      <q>Who are the primary users? (Role, context, tech literacy)</q>
+      <q>How do they access it? (Desktop, mobile, both?)</q>
+      <q>What's their main goal when using the product?</q>
       <q>What frustrates them with current solutions?</q>
     </questions>
 
-    <action>Clarify product context:</action>
+    <action>Ask about the SCOPE:</action>
     <questions>
-      <q>What's the product? (SaaS, landing page, e-commerce, dashboard, mobile app...)</q>
-      <q>What's the core value proposition in one sentence?</q>
-      <q>What's the business goal? (Conversion, engagement, retention, clarity)</q>
-      <q>Who are the competitors? What do they do well / poorly?</q>
-      <q>Are there brand guidelines, logos, or existing visual assets?</q>
-      <q>What's the tech stack? (Impacts feasibility of animations, interactions)</q>
+      <q>Which screens/pages need to be designed? List them all.</q>
+      <q>What are the critical user flows? (Sign up → onboard → use → convert)</q>
+      <q>Dark mode needed?</q>
+      <q>Accessibility level? (WCAG AA minimum recommended)</q>
     </questions>
 
-    <action>Clarify scope:</action>
-    <questions>
-      <q>Which screens/pages need to be designed?</q>
-      <q>What are the critical user flows? (Happy path + error paths)</q>
-      <q>Are there constraints? (Accessibility level, performance budget, deadline)</q>
-    </questions>
-
-    <action>Ask precise questions — generic "Tell me more" doesn't advance clarity</action>
-    <action>If user has existing product/competitors, research them via web search</action>
+    <action>If the user mentions competitors or references, research them via web search</action>
+    <action>If there is an existing .pen file, note it — the Pencil agent will need to read it</action>
   </step>
 
   <!-- ═══════════════════════════════════════════════════ -->
   <!-- PHASE 2: UX STRATEGY                               -->
   <!-- ═══════════════════════════════════════════════════ -->
 
-  <step n="2" goal="Define user flows and information architecture">
-    <critical>Structure before aesthetics — the IA dictates everything that follows</critical>
+  <step n="2" goal="Define information architecture and user flows">
+    <action>Create the sitemap — every screen/page with hierarchy:</action>
+    <example>
+      Home (Landing Page)
+      ├── Hero section
+      ├── Features section
+      ├── Pricing section
+      ├── Testimonials
+      └── Footer
+      Dashboard
+      ├── Sidebar navigation
+      ├── Overview (default view)
+      ├── Projects list
+      ├── Project detail
+      └── Settings
+    </example>
 
-    <action>Map the sitemap / screen inventory:</action>
+    <action>For each screen, define content hierarchy:</action>
     <list>
-      <item>List every screen/page needed</item>
-      <item>Define the navigation structure (hierarchy, grouping)</item>
-      <item>Identify entry points (where users land first)</item>
+      <item>Primary content — what the user came here for</item>
+      <item>Primary action — the ONE thing you want them to do (CTA)</item>
+      <item>Secondary content and actions</item>
+      <item>Navigation elements</item>
     </list>
 
-    <action>For each screen, define:</action>
+    <action>Map critical user flows step by step:</action>
     <list>
-      <item>Content inventory: what information is displayed?</item>
-      <item>Hierarchy: primary, secondary, tertiary content</item>
-      <item>Actions: what can the user do? (Primary CTA, secondary actions)</item>
-      <item>States: empty, loading, populated, error, success, editing</item>
-      <item>Connections: what comes before, what comes after</item>
+      <item>Happy path: entry → goal completion</item>
+      <item>Error paths: what fails, how to recover</item>
+      <item>Empty states: first use, no data</item>
     </list>
 
-    <action>Map critical user flows:</action>
+    <action>Define all screen states:</action>
     <list>
-      <item>Happy path: step-by-step from entry to goal completion</item>
-      <item>Error paths: what can go wrong at each step, how to recover</item>
-      <item>Edge cases: empty data, slow network, permission denied</item>
+      <item>Empty — first visit, no data</item>
+      <item>Loading — data being fetched</item>
+      <item>Populated — normal use</item>
+      <item>Error — something went wrong</item>
+      <item>Success — action completed</item>
     </list>
-
-    <output>Documented IA with sitemap, screen inventory, and user flows</output>
   </step>
 
-  <step n="3" goal="Design wireframe layouts (ASCII)">
-    <action>For each screen, create ASCII wireframes showing:</action>
-    <list>
-      <item>Component placement and spatial grouping</item>
-      <item>Visual hierarchy through sizing and position</item>
-      <item>Primary and secondary action placement</item>
-      <item>Content zones and their relationships</item>
-    </list>
+  <step n="3" goal="Create wireframe layouts (ASCII)">
+    <critical>Structure before aesthetics — wireframes validate the IA</critical>
 
-    <action>Create one wireframe per breakpoint:</action>
+    <action>For each screen, create ASCII wireframes for:</action>
     <list>
-      <item>Mobile (375px) — primary, design mobile-first</item>
-      <item>Tablet (768px) — if layout changes significantly</item>
+      <item>Mobile (375px) — design mobile-first</item>
       <item>Desktop (1440px) — full layout</item>
+      <item>Tablet (768px) — only if layout changes significantly</item>
     </list>
 
     <rules>
-      <rule>Use spacing to show relationships (grouped = close, separate = distant)</rule>
-      <rule>Use ASCII symbols for interactive elements: [Button], [___input___], (radio), [x] checkbox, [v dropdown]</rule>
-      <rule>Show ALL states (empty, loading, filled, error)</rule>
-      <rule>Annotate decisions: why is this element here? Why this order?</rule>
+      <rule>Use clear ASCII notation:
+        [Button Label]     — button
+        [___placeholder___] — text input
+        (o) Option          — radio
+        [x] Checked         — checkbox
+        [v Select ▾]       — dropdown
+        ┌─────────┐        — card/container
+        │ content  │
+        └─────────┘
+      </rule>
+      <rule>Annotate WHY elements are positioned where they are</rule>
+      <rule>Show the primary CTA prominently in each screen</rule>
+      <rule>Group related elements with visual proximity</rule>
     </rules>
   </step>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- PHASE 3: ART DIRECTION                             -->
+  <!-- PHASE 3: ART DIRECTION — PENCIL MAPPING             -->
   <!-- ═══════════════════════════════════════════════════ -->
 
-  <step n="4" goal="Define the visual identity and art direction">
-    <critical>Every visual choice must be justified by the brand personality and user context</critical>
+  <step n="4" goal="Select Pencil style archetype and parameters">
+    <critical>Map every visual decision to a Pencil option — no abstract choices</critical>
 
-    <action>Define brand personality (pick 3-5 adjectives):</action>
-    <example>Modern, trustworthy, minimal, bold, playful, premium, warm, technical...</example>
-    <action>Justify each adjective based on user research and business goals</action>
+    <action>Based on brand personality and user research, select:</action>
 
-    <action>Define mood and references:</action>
+    <decision name="Pencil Style Archetype">
+      <instruction>Pick ONE from the 10 styles listed in pencil-reference above</instruction>
+      <instruction>Justify: why does this style fit the brand personality and user context?</instruction>
+      <instruction>Note anti-references: which styles were rejected and why?</instruction>
+    </decision>
+
+    <decision name="Color Palette">
+      <instruction>Pick ONE from the 10 palettes</instruction>
+      <instruction>Justify: what emotion does this palette convey? How does it serve the brand?</instruction>
+      <instruction>If user has existing brand colors, note them — the Pencil agent can override palette values via set_variables</instruction>
+    </decision>
+
+    <decision name="Typography">
+      <instruction>Pick fonts for each role:</instruction>
+      <list>
+        <item>headings — display, H1-H3, navigation labels (maps to $--font-primary)</item>
+        <item>body — paragraph text, descriptions (maps to $--font-secondary)</item>
+        <item>captions — small text, metadata, timestamps</item>
+        <item>data — numbers, tables, dashboards (if style supports it)</item>
+      </list>
+      <instruction>Justify each choice: what personality does this font convey?</instruction>
+    </decision>
+
+    <decision name="Elevation" condition="if style supports it">
+      <instruction>Pick ONE shadow style from: Gentle Lift, Sharp Depth, Soft Cloud, Soft Lift</instruction>
+      <instruction>Justify: sharp for precision, soft for approachability, etc.</instruction>
+    </decision>
+
+    <decision name="Decorative Imagery" condition="if style supports it">
+      <instruction>Pick the imagery approach from the style's options</instruction>
+      <instruction>Describe the imagery tone and subjects</instruction>
+    </decision>
+
+    <decision name="Pencil Guide(s)">
+      <instruction>Pick the relevant guide(s) the Pencil agent should load:</instruction>
+      <list>
+        <item>Web App — for SaaS, dashboards, admin panels</item>
+        <item>Landing Page — for marketing, conversion pages</item>
+        <item>Mobile App — for mobile screens</item>
+        <item>Design System — ALWAYS include this one for component composition</item>
+        <item>Table — if the product has data tables</item>
+      </list>
+    </decision>
+  </step>
+
+  <step n="5" goal="Define the design token overrides">
+    <critical>If user has specific brand colors or fonts, define custom variable values</critical>
+
+    <action>List ALL design token overrides the Pencil agent should apply via set_variables:</action>
+    <example>
+      Variables to set:
+        --background: "#FAFAFA"      (override palette default — user wants slightly warmer)
+        --primary: "#6366F1"         (brand purple — overrides palette accent)
+        --font-primary: "Inter"      (already selected above)
+        --font-secondary: "Inter"    (same font, different weights)
+        --radius-m: 8               (medium roundness for cards and inputs)
+    </example>
+
+    <action>If user needs dark mode, define themed variables:</action>
+    <example>
+      Themed variables:
+        --background: light="#FFFFFF", dark="#0A0A0A"
+        --foreground: light="#171717", dark="#EDEDED"
+        --card: light="#FFFFFF", dark="#1A1A1A"
+    </example>
+
+    <action>Define any custom semantic tokens not in Pencil's defaults:</action>
+    <example>
+      Custom tokens:
+        --color-success: "#22C55E"
+        --color-warning: "#F59E0B"
+        --color-error: "#EF4444"
+        --color-info: "#3B82F6"
+    </example>
+  </step>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- PHASE 4: COMPONENT &amp; INTERACTION BRIEF             -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <step n="6" goal="Define component requirements per screen">
+    <action>For each screen in the sitemap, list:</action>
+
+    <screen-brief>
+      <field>Screen name and purpose</field>
+      <field>Pencil frame dimensions (width x height or fit_content)</field>
+      <field>Layout direction (vertical/horizontal) and structure</field>
+      <field>Components needed — map to Pencil's Design System guide components:
+        - Sidebar (with nav items)
+        - Card (with slots: header, content, actions)
+        - Table (Table > Row > Cell hierarchy)
+        - Button (primary, secondary, ghost, destructive)
+        - Input (text, search, select)
+        - Modal/Dialog
+        - Toast/Notification
+        - Badge/Tag
+        - Avatar
+        - Tabs
+        - Pagination
+      </field>
+      <field>Content — actual text content for headings, labels, CTAs, descriptions</field>
+      <field>Icons — specific icon names from lucide/feather/Material Symbols</field>
+      <field>Images — describe what images should show (for G() AI generation)</field>
+      <field>States to design — which states of this screen need separate frames?</field>
+    </screen-brief>
+  </step>
+
+  <step n="7" goal="Define micro-interactions and motion">
+    <action>Define interaction patterns (for implementation reference, not Pencil):</action>
+
     <list>
-      <item>Visual mood: what should the product FEEL like? (Calm, energetic, luxurious, friendly)</item>
-      <item>Reference products/sites that capture the right feeling (cite 3-5)</item>
-      <item>Anti-references: what the product should NOT feel like</item>
+      <item>Button hover/active/loading behavior</item>
+      <item>Card hover effect (shadow lift? border highlight?)</item>
+      <item>Modal entrance/exit animation (fade+scale? slide from bottom?)</item>
+      <item>Toast entrance and auto-dismiss duration</item>
+      <item>Page transitions (fade? slide? none?)</item>
+      <item>Loading patterns (skeleton shimmer? spinner? progress bar?)</item>
+      <item>Scroll behavior (sticky header? reveal on scroll up?)</item>
     </list>
 
-    <action>Define color palette:</action>
+    <action>Define duration scale:</action>
     <list>
-      <item>Primary color — the brand color (hex value, usage: CTAs, key accents)</item>
-      <item>Secondary color — supporting (hex value, usage)</item>
-      <item>Neutral palette — backgrounds, text, borders (light + dark mode if applicable)</item>
-      <item>Semantic colors — success (green), warning (amber), error (red), info (blue) with exact hex</item>
-      <item>Contrast ratios — verify WCAG AA minimum (4.5:1 text, 3:1 large text)</item>
-      <item>Dark mode palette if applicable</item>
-    </list>
-    <action>Justify color choices: why this hue? What emotion does it convey? What does it say about the brand?</action>
-
-    <action>Define typography:</action>
-    <list>
-      <item>Font family — heading font + body font (Google Fonts or system fonts for performance)</item>
-      <item>Type scale — define each level with exact values:</item>
-      <item>  Display: size, weight, line-height, letter-spacing, usage</item>
-      <item>  H1: size, weight, line-height, letter-spacing, usage</item>
-      <item>  H2: size, weight, line-height, letter-spacing, usage</item>
-      <item>  H3: size, weight, line-height, letter-spacing, usage</item>
-      <item>  Body large: size, weight, line-height, usage</item>
-      <item>  Body: size, weight, line-height, usage</item>
-      <item>  Body small: size, weight, line-height, usage</item>
-      <item>  Caption: size, weight, line-height, usage</item>
-      <item>Responsive adjustments (smaller sizes on mobile)</item>
-    </list>
-    <action>Justify font choice: what personality does it convey? Why does it fit the brand?</action>
-
-    <action>Define spacing system:</action>
-    <list>
-      <item>Base unit (recommend 4px or 8px)</item>
-      <item>Spacing scale: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128 (or custom)</item>
-      <item>Section spacing, card padding, element gaps — specific values</item>
-      <item>Max content width (e.g., 1200px, 1440px)</item>
-      <item>Grid: columns, gutter, margins per breakpoint</item>
-    </list>
-
-    <action>Define visual treatments:</action>
-    <list>
-      <item>Border radius: none, small (4px), medium (8px), large (16px), full (pill) — when to use each</item>
-      <item>Shadows: levels (subtle, medium, elevated) with exact values (x, y, blur, spread, color)</item>
-      <item>Borders: when to use, thickness, color</item>
-      <item>Imagery style: photography, illustration, icons, abstract — what style, what tone</item>
-      <item>Icon style: outlined, filled, duotone — size grid, stroke width</item>
-      <item>Background treatments: solid, gradient, pattern, texture</item>
+      <item>Fast: 150ms (hover states, micro-feedback)</item>
+      <item>Normal: 300ms (transitions, modals)</item>
+      <item>Slow: 500ms (page transitions, complex animations)</item>
     </list>
   </step>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- PHASE 4: COMPONENT &amp; INTERACTION SPECS             -->
+  <!-- PHASE 5: GENERATE THE SPEC FILE                     -->
   <!-- ═══════════════════════════════════════════════════ -->
 
-  <step n="5" goal="Define the component library specs">
-    <action>For each component type, specify:</action>
+  <step n="8" goal="Generate the Pencil-ready design spec">
+    <critical>This file is the SINGLE SOURCE OF TRUTH for the Pencil agent</critical>
+    <critical>It must contain ZERO ambiguity — every decision is made, every value is specified</critical>
 
-    <component-spec>
-      <field>Name</field>
-      <field>Purpose — when and why to use it</field>
-      <field>Variants — size (sm, md, lg), style (primary, secondary, ghost, destructive), state (default, hover, active, disabled, loading)</field>
-      <field>Anatomy — what elements compose it (icon + label + chevron, etc.)</field>
-      <field>Spacing — internal padding, gaps between elements (exact px values)</field>
-      <field>Typography — which type scale token for each text element</field>
-      <field>Colors — background, text, border, icon for each variant and state</field>
-      <field>Border radius — which radius token</field>
-      <field>Shadow — which shadow level, if any</field>
-      <field>Accessibility — focus ring style, ARIA role, keyboard behavior</field>
-    </component-spec>
-
-    <action>Core components to define (at minimum):</action>
-    <list>
-      <item>Button (primary, secondary, ghost, destructive, icon-only)</item>
-      <item>Input (text, email, password, search, textarea)</item>
-      <item>Select / Dropdown</item>
-      <item>Card</item>
-      <item>Modal / Dialog</item>
-      <item>Navigation (header, sidebar, mobile menu)</item>
-      <item>Toast / Notification</item>
-      <item>Badge / Tag</item>
-      <item>Avatar</item>
-      <item>Table (if applicable)</item>
-      <item>Form layout (labels, hints, errors)</item>
-    </list>
-  </step>
-
-  <step n="6" goal="Define micro-interactions and motion design">
-    <action>Global motion principles:</action>
-    <list>
-      <item>Duration scale: instant (0ms), fast (150ms), normal (300ms), slow (500ms)</item>
-      <item>Easing: default (ease-out for entrances, ease-in for exits, ease-in-out for state changes)</item>
-      <item>Philosophy: motion should feel natural, not decorative</item>
-    </list>
-
-    <action>Page transitions:</action>
-    <list>
-      <item>Between pages/routes: type (fade, slide, none), duration, easing</item>
-      <item>Loading between pages: skeleton, progress bar, or spinner</item>
-    </list>
-
-    <action>Component interactions:</action>
-    <list>
-      <item>Button: hover (scale? color shift?), active (press effect?), loading (spinner inside?)</item>
-      <item>Cards: hover (lift shadow? border highlight?), click feedback</item>
-      <item>Modals: entrance (fade+scale from center? slide from bottom?), exit</item>
-      <item>Toasts: entrance (slide from top/bottom?), auto-dismiss duration, exit</item>
-      <item>Navigation: mobile menu open/close animation</item>
-      <item>Scroll: parallax? Sticky header behavior? Scroll-triggered reveals?</item>
-    </list>
-
-    <action>Feedback patterns:</action>
-    <list>
-      <item>Success: what happens visually? (Checkmark animation, green flash, toast)</item>
-      <item>Error: inline message style, shake animation?, red highlight duration</item>
-      <item>Loading: skeleton shimmer speed, spinner style, progress bar behavior</item>
-      <item>Empty state: illustration + message + CTA pattern</item>
-    </list>
-  </step>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- PHASE 5: PENCIL-READY DELIVERABLE                  -->
-  <!-- ═══════════════════════════════════════════════════ -->
-
-  <step n="7" goal="Compile the design spec document">
-    <critical>This document is the SINGLE SOURCE OF TRUTH for the Pencil agent</critical>
-    <critical>It must be complete enough that Pencil can design every screen without asking questions</critical>
-
-    <action>Generate the spec file at: $PROJECT_ROOT/_flow_output/planning-artifacts/design-spec.md</action>
+    <action>Save to: $PROJECT_ROOT/_flow_output/planning-artifacts/design-spec.md</action>
 
     <template>
 # Design Spec — {{project_name}}
 
-## 1. Context
-- **Product**: [type, description]
-- **Target users**: [personas, context, goals]
+> This spec is the complete brief for the Pencil agent. Follow it step by step.
+
+## 1. Project Context
+
+- **Product type**: [SaaS / Landing Page / Mobile App / ...]
+- **Core proposition**: [one sentence]
+- **Target users**: [who, context, goals]
 - **Business goal**: [primary metric]
-- **Competitors**: [who, strengths, weaknesses]
+- **Tech stack**: [for implementation reference]
 
-## 2. Brand Personality
-- **Adjectives**: [3-5 with justification]
-- **Mood**: [description]
-- **References**: [3-5 products/sites with what to take from each]
-- **Anti-references**: [what to avoid, with why]
+## 2. Pencil Configuration
 
-## 3. Sitemap &amp; User Flows
-[Sitemap tree]
-[User flow diagrams per critical path]
+### Style Archetype
+- **Style**: [exact name from Pencil's 10 styles]
+- **Why**: [justification]
 
-## 4. Art Direction
+### Style Parameters
+```yaml
+colorPalette: "[exact palette name]"
+headings: "[font name]"
+body: "[font name]"
+captions: "[font name]"
+data: "[font name]"          # if style supports it
+roundness: "Basic Roundness"
+elevation: "[elevation name]" # if style supports it
+decorativeImagery: "[option]" # if style supports it
+```
 
-### Color Palette
-| Token | Hex | Usage | Contrast |
-|-------|-----|-------|----------|
-| primary | #xxx | CTAs, key accents | AA on white |
-| ... | ... | ... | ... |
+### Pencil Guides to Load
+1. `get_guidelines({ category: "guide", name: "[Guide Name]" })`
+2. `get_guidelines({ category: "guide", name: "Design System" })`
 
-### Typography
-| Token | Font | Size | Weight | Line-height | Usage |
-|-------|------|------|--------|-------------|-------|
-| display | ... | ... | ... | ... | Hero headings |
-| ... | ... | ... | ... | ... | ... |
+### Design Token Overrides
+```yaml
+# Call set_variables with these values AFTER loading the style
+variables:
+  --background: "[hex]"
+  --foreground: "[hex]"
+  --primary: "[hex]"
+  --secondary: "[hex]"
+  --card: "[hex]"
+  --border: "[hex]"
+  --muted-foreground: "[hex]"
+  --destructive: "[hex]"
+  --font-primary: "[font name]"
+  --font-secondary: "[font name]"
+  --radius-m: [number]
+  --radius-pill: [number]
+  # Custom tokens:
+  --color-success: "[hex]"
+  --color-warning: "[hex]"
+  --color-error: "[hex]"
+```
 
-### Spacing
-- Base unit: Xpx
-- Scale: [values]
-- Grid: [columns, gutter, margins per breakpoint]
-- Max width: Xpx
+### Dark Mode (if applicable)
+```yaml
+themes:
+  axes:
+    mode: ["light", "dark"]
+  variables:
+    --background: { light: "[hex]", dark: "[hex]" }
+    --foreground: { light: "[hex]", dark: "[hex]" }
+    --card: { light: "[hex]", dark: "[hex]" }
+    # ... etc
+```
 
-### Visual Treatments
-- Border radius: [tokens and usage]
-- Shadows: [levels with exact values]
-- Icons: [style, size grid, source library]
-- Imagery: [style, tone, guidelines]
+## 3. Sitemap
 
-## 5. Component Specs
-[For each component: name, variants, states, anatomy, spacing, colors, a11y]
+[Tree structure of all screens/pages]
 
-## 6. Wireframes
-[ASCII wireframes per screen per breakpoint with annotations]
+## 4. User Flows
 
-## 7. Micro-interactions &amp; Motion
-- Duration scale: [values]
-- Easing defaults: [values]
-- Page transitions: [spec]
-- Component interactions: [per component]
-- Feedback patterns: [success, error, loading, empty]
+### Flow: [Name]
+1. [Step] → [Screen]
+2. [Step] → [Screen]
+...
 
-## 8. Responsive Strategy
-- Mobile (375px): [approach]
-- Tablet (768px): [approach]
-- Desktop (1440px): [approach]
-- Breakpoint-specific decisions: [what changes and why]
+## 5. Screen Specifications
 
-## 9. Accessibility
-- Target level: [WCAG AA / AAA]
-- Focus management: [ring style, tab order strategy]
-- Color contrast: [verified ratios]
-- Screen reader: [landmark structure, ARIA patterns]
-- Reduced motion: [fallback behavior]
+### Screen: [Name]
+- **Purpose**: [why this screen exists]
+- **Frame**: [width]x[height or fit_content]
+- **Layout**: [vertical/horizontal]
+- **Pencil guide rules**: [specific rules from the guide that apply]
 
-## 10. Pencil Implementation Notes
-[Specific guidance for the Pencil agent: page order, component priority, what to design first]
+#### Structure
+```
+[ASCII wireframe with annotations]
+```
+
+#### Components
+| Component | Type | Content | Icon | Notes |
+|-----------|------|---------|------|-------|
+| Header | frame, horizontal | — | — | sticky, $--background |
+| Logo | text | "ProductName" | — | $--font-primary, 20px, bold |
+| Nav Item | text | "Dashboard" | lucide/layout-dashboard | $--muted-foreground |
+| CTA | frame + text | "Get Started" | — | $--primary bg, white text |
+| ... | ... | ... | ... | ... |
+
+#### States
+- **Empty**: [what to show, illustration prompt for G()]
+- **Loading**: [skeleton pattern]
+- **Error**: [error message, recovery action]
+
+#### Images (for G() operations)
+| Element | Type | Prompt |
+|---------|------|--------|
+| Hero background | "ai" | "[detailed prompt]" |
+| Avatar | "stock" | "[description]" |
+
+[Repeat for each screen]
+
+## 6. Responsive Strategy
+
+- **Mobile (375px)**: [what changes — stacked layout, hidden sidebar, bottom nav]
+- **Tablet (768px)**: [what changes]
+- **Desktop (1440px)**: [full layout as designed]
+
+## 7. Micro-interactions (for implementation)
+
+| Interaction | Animation | Duration | Easing |
+|-------------|-----------|----------|--------|
+| Button hover | scale 1.02, shadow lift | 150ms | ease-out |
+| Card hover | shadow.md → shadow.lg | 200ms | ease-out |
+| Modal open | fade + scale from 0.95 | 300ms | ease-out |
+| Toast enter | slide from top | 300ms | ease-out |
+| Page transition | fade | 200ms | ease-in-out |
+
+## 8. Accessibility
+
+- **Target**: WCAG AA
+- **Focus ring**: 2px solid $--primary, 2px offset
+- **Tab order**: [key navigation paths]
+- **Reduced motion**: disable all animations, instant transitions
+
+## 9. Pencil Execution Order
+
+> The Pencil agent should follow this order:
+
+1. Open/create .pen file
+2. Load style: `get_guidelines({ category: "style", name: "[style]", params: {...} })`
+3. Load guide(s): `get_guidelines({ category: "guide", name: "[guide]" })`
+4. Set variable overrides: `set_variables({ variables: {...} })`
+5. Design Screen 1: [name] — [priority: high/medium/low]
+6. Design Screen 2: [name] — [priority]
+7. ... [in order of importance]
+8. Verify each screen: `get_screenshot` after completion
+9. Audit consistency: `search_all_unique_properties` for colors, fonts, spacing
     </template>
   </step>
 
-  <step n="8" goal="Validate and present to user">
-    <action>Present a summary to the user with:</action>
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- PHASE 6: VALIDATE WITH USER                         -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <step n="9" goal="Present summary and get user validation">
+    <action>Present a concise summary:</action>
     <list>
-      <item>Brand personality and mood in 2-3 sentences</item>
-      <item>Color palette visual preview (hex codes)</item>
-      <item>Typography choices with reasoning</item>
-      <item>Key layout decisions</item>
-      <item>One example wireframe (most important screen)</item>
+      <item>Pencil style chosen + color palette + why</item>
+      <item>Typography pairing (headings / body / captions)</item>
+      <item>Number of screens to design</item>
+      <item>Key layout decisions (one example wireframe)</item>
+      <item>Design token overrides (if any)</item>
     </list>
 
-    <action>Ask for user validation:</action>
+    <action>Ask for validation:</action>
     <list>
-      <item>Does the brand personality feel right?</item>
-      <item>Are the colors aligned with your vision?</item>
-      <item>Does the layout structure make sense?</item>
-      <item>Anything missing or to adjust before Pencil execution?</item>
+      <item>Does the visual direction feel right?</item>
+      <item>Are the screens complete — anything missing?</item>
+      <item>Any specific preferences to override?</item>
+      <item>Ready for Pencil execution?</item>
     </list>
 
-    <action>Iterate based on feedback until user approves</action>
+    <action>Iterate until user approves</action>
 
     <output>
-      Design spec saved to: _flow_output/planning-artifacts/design-spec.md
-      Next step: Open Pencil and use this spec as the brief for visual design execution.
+      Design spec saved: _flow_output/planning-artifacts/design-spec.md
+
+      Next step: open Pencil and run the spec.
+      The Pencil agent should:
+        1. get_guidelines → load style + guide
+        2. set_variables → apply tokens
+        3. batch_design → build each screen
+        4. get_screenshot → verify each screen
     </output>
   </step>
 
   <decision-framework>
-    <test name="Clarity">Does this make the interface clearer?</test>
-    <test name="Consistency">Does this align with existing patterns?</test>
-    <test name="Usability">Can users accomplish their goal efficiently?</test>
-    <test name="Performance">Does this add unnecessary visual complexity?</test>
-    <test name="Accessibility">Keyboard accessible? Readable? WCAG compliant?</test>
-    <test name="Intentionality">Does this serve a purpose, or is it decoration?</test>
-    <rule>If a design choice fails any test, reconsider it.</rule>
+    <test name="Pencil-compatible">Can this be directly executed with Pencil's tools?</test>
+    <test name="Unambiguous">Would the Pencil agent need to ask a follow-up question?</test>
+    <test name="Complete">Are all screens, states, components, and tokens specified?</test>
+    <test name="Justified">Is every visual choice backed by user/brand reasoning?</test>
+    <rule>If a decision fails any test, refine it before including it in the spec.</rule>
   </decision-framework>
 
 </workflow>
