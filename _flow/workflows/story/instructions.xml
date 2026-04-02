@@ -40,6 +40,10 @@
     <action>Load epic file from planning artifacts (epic-{{epic_num}}*.md)</action>
     <action>Extract: epic objectives, ALL stories for cross-story context, our story's requirements, ACs, dependencies</action>
 
+    <!-- Source of truth hierarchy -->
+    <critical>Epic ACs = functional source of truth (WHAT must exist). Design = visual guide (HOW it looks).
+      If the design omits a feature required by the epic/ACs, the feature is STILL required — infer UI from conventions.</critical>
+
     <!-- Design extraction (when .pen references exist) -->
     <check if="story has .pen Design Reference in epic">
       <action>Pencil MCP: batch_get to read .pen nodes</action>
@@ -79,6 +83,18 @@
       - Tasks/Subtasks: detailed implementation steps with AC references
       - Dev Notes: architecture requirements, key files, constraints, design tokens, previous story learnings, relevant antipatterns from learnings.xml
     </action>
+
+    <!-- Functional completeness check -->
+    <critical>Before finalizing tasks, run these two validations:</critical>
+
+    <action>AC → UI path check: For each operation required by the ACs (every CRUD verb, every user action),
+      verify that the generated tasks include a UI element that triggers it.
+      If missing: add a task for the missing UI element, using standard conventions (e.g., delete button in list rows, edit icon, etc.).</action>
+
+    <action>Backend ↔ Frontend cross-check: List every Server Action / API route in the backend tasks.
+      For each one, confirm a frontend task exists that calls it.
+      If a Server Action has no UI trigger: add the missing frontend task.
+      Log any additions in Dev Notes as "Added by functional completeness check — not in design".</action>
 
     <action>Set Status: ready-for-dev</action>
   </step>
