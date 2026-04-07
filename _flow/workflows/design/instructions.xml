@@ -135,6 +135,19 @@
 
     <action>If the user mentions competitors or references, research them via web search</action>
     <action>If there is an existing .pen file, note it — the Pencil agent will need to read it</action>
+
+    <!-- Industry-aware reasoning -->
+    <action>Based on product type, apply domain-specific UX heuristics:</action>
+    <industry-hints>
+      <hint type="SaaS / Dashboard" rules="Data density over decoration. Sidebar nav mandatory. Tables need sort/filter/bulk actions. Empty states must guide to first action. Status indicators with semantic colors." />
+      <hint type="E-commerce" rules="Trust signals above fold. Product images dominate. Cart always accessible. Checkout ≤3 steps. Price/CTA contrast ratio critical. Reviews near buy button." />
+      <hint type="Landing Page" rules="Single CTA per viewport. Social proof within 1 scroll. F-pattern or Z-pattern layout. Hero must communicate value in &lt;5 seconds. Sticky CTA on mobile." />
+      <hint type="Mobile App" rules="Thumb zone for primary actions. Bottom nav ≤5 items. Pull-to-refresh for lists. Swipe gestures for secondary actions. 44x44px minimum touch targets." />
+      <hint type="Fintech / Banking" rules="Security perception paramount. Conservative palette (blues/greens). Numbers always monospace. Transaction history is the core view. Confirmation dialogs for all money movements." />
+      <hint type="Content / Editorial" rules="Reading comfort first. Max 65-75 chars per line. Generous line-height (1.6-1.8). Serif or humanist sans for body. Minimal UI chrome — content IS the interface." />
+      <hint type="B2B / Enterprise" rules="Role-based views. Dense information layout. Keyboard-navigable everything. Export/reporting always accessible. Onboarding complexity requires progressive disclosure." />
+    </industry-hints>
+    <action>Use these as starting assumptions — override when user research contradicts them</action>
   </step>
 
   <!-- ═══════════════════════════════════════════════════ -->
@@ -345,6 +358,18 @@
       <item>Normal: 300ms (transitions, modals)</item>
       <item>Slow: 500ms (page transitions, complex animations)</item>
     </list>
+
+    <!-- Animation quality rules -->
+    <critical>Apply these animation constraints — non-negotiable for performance:</critical>
+    <animation-rules>
+      <rule>Only animate transform and opacity — never animate layout properties (width, height, top, left, margin, padding)</rule>
+      <rule>Use will-change sparingly — only on elements that will actually animate, remove after animation completes</rule>
+      <rule>All durations between 150ms-500ms — below 100ms feels instant (pointless), above 500ms feels sluggish</rule>
+      <rule>Easing: ease-out for entrances (decelerating), ease-in for exits (accelerating), ease-in-out for state changes</rule>
+      <rule>Stagger delay for lists: 30-50ms between items, max 8 items staggered (beyond that, animate as group)</rule>
+      <rule>MANDATORY: all animations must respect prefers-reduced-motion — provide instant transitions as fallback</rule>
+      <rule>Target: Cumulative Layout Shift (CLS) &lt; 0.1 — animations must not cause layout shifts</rule>
+    </animation-rules>
   </step>
 
   <!-- ═══════════════════════════════════════════════════ -->
@@ -488,12 +513,25 @@ themes:
 | Toast enter | slide from top | 300ms | ease-out |
 | Page transition | fade | 200ms | ease-in-out |
 
-## 8. Accessibility
+## 8. Accessibility &amp; Quality Checklist
 
 - **Target**: WCAG AA
 - **Focus ring**: 2px solid $--primary, 2px offset
 - **Tab order**: [key navigation paths]
 - **Reduced motion**: disable all animations, instant transitions
+
+### Quality Gates (must pass before spec is final)
+| Criterion | Threshold | How to verify |
+|-----------|-----------|---------------|
+| Color contrast (text) | ≥ 4.5:1 normal, ≥ 3:1 large (18px+) | Check $--foreground on $--background, $--muted-foreground on $--card |
+| Color contrast (UI) | ≥ 3:1 for interactive elements | Check $--primary on $--background, $--border visibility |
+| Touch targets | ≥ 44x44px on mobile | All buttons, links, inputs, icons |
+| Line length | 45-75 characters | Body text containers |
+| Line height | ≥ 1.5 for body text | $--font-secondary usage |
+| Animation duration | 150-500ms range | All micro-interactions |
+| CLS budget | &lt; 0.1 | No layout-shifting animations |
+| Focus visible | Every interactive element | Tab through all screens mentally |
+| Color not sole indicator | Status uses icon + color | Error, success, warning states |
 
 ## 9. Pencil Execution Order
 
@@ -552,6 +590,8 @@ themes:
     <test name="Unambiguous">Would the Pencil agent need to ask a follow-up question?</test>
     <test name="Complete">Are all screens, states, components, and tokens specified?</test>
     <test name="Justified">Is every visual choice backed by user/brand reasoning?</test>
+    <test name="Quality gates passed">Do all design tokens pass the accessibility and quality checklist in Section 8?</test>
+    <test name="Industry-aware">Do the UX patterns match the product type's domain heuristics?</test>
     <rule>If a decision fails any test, refine it before including it in the spec.</rule>
   </decision-framework>
 
