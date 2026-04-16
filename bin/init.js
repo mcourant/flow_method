@@ -7,6 +7,7 @@ const targetDir = process.cwd();
 const packageDir = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const command = args[0];
+const hasDatasetFlag = args.includes('--dataset');
 
 // Files/dirs to copy into the target project
 const entries = ['_flow', '.claude', '_flow_output'];
@@ -55,6 +56,51 @@ function copyRecursive(src, dest, { forceUpdate = false } = {}) {
     fs.copyFileSync(src, dest);
     console.log(`  ${forceUpdate ? 'ADD' : 'COPY'}: ${rel}`);
   }
+}
+
+// ─── DATASET MODE ───
+if (command === 'dataset' || hasDatasetFlag) {
+  const markerPath = path.join(targetDir, '.flow-dataset');
+  const exists = fs.existsSync(markerPath);
+
+  console.log('\n  FLOW Method — Dataset Capture\n');
+
+  if (exists) {
+    console.log('  Dataset capture is currently ENABLED (.flow-dataset exists)');
+    const readline = require('readline');
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question('  Disable dataset capture? (y/n): ', (answer) => {
+      if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        fs.unlinkSync(markerPath);
+        console.log('  Dataset capture disabled (.flow-dataset removed)\n');
+      } else {
+        console.log('  No changes made.\n');
+      }
+      rl.close();
+    });
+  } else {
+    const readline = require('readline');
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question('  Enable dataset capture for training? (y/n, default: y): ', (answer) => {
+      const val = (answer || 'y').toLowerCase();
+      if (val === 'y' || val === 'yes') {
+        fs.writeFileSync(markerPath, '');
+        // Try to get project name from config
+        const configPath = path.join(targetDir, '_flow', 'config.xml');
+        let projectSlug = path.basename(targetDir);
+        if (fs.existsSync(configPath)) {
+          const match = fs.readFileSync(configPath, 'utf8').match(/<name>(.*?)<\/name>/);
+          if (match) projectSlug = match[1].toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+        }
+        console.log('\n  Dataset capture enabled (.flow-dataset marker created)');
+        console.log('  Events will be saved to ~/.claude/datasets/' + projectSlug + '/\n');
+      } else {
+        console.log('  No changes made.\n');
+      }
+      rl.close();
+    });
+  }
+  process.exit(0);
 }
 
 // ─── UPDATE MODE ───
