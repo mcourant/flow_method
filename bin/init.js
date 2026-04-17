@@ -77,6 +77,7 @@ if (command === 'dataset' || hasDatasetFlag) {
         console.log('  No changes made.\n');
       }
       rl.close();
+      process.exit(0);
     });
   } else {
     const readline = require('readline');
@@ -98,9 +99,9 @@ if (command === 'dataset' || hasDatasetFlag) {
         console.log('  No changes made.\n');
       }
       rl.close();
+      process.exit(0);
     });
   }
-  process.exit(0);
 }
 
 // ─── UPDATE MODE ───
