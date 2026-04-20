@@ -1,6 +1,6 @@
 {
   "name": "flow-method",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "AI-driven development workflow for Claude Code — story creation, dev, review, retro, and more",
   "bin": {
     "flow-method": "./bin/init.js"
